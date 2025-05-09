@@ -1,5 +1,5 @@
 # Splines
 An interactive application to visualize splines written in JavaScript and HTML canvas
 
+![image](https://github.com/user-attachments/assets/c3615c0b-1f36-4eb6-8b49-4a67cc48bc38)
 
-![image](https://github.com/user-attachments/assets/68198337-0de2-4c46-93a8-1a8cdc8ccc46)
