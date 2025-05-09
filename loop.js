@@ -27,6 +27,8 @@ class Spline{
         p3 = p2+1;
         p0 = p1-1;
 
+        t = t - Math.floor(t);      //dont get this either
+
         //console.log(p0,p1,p2,p3);
         
 
@@ -51,7 +53,7 @@ class Spline{
 
 
 
-let vertex_arr = [new Vertex(new Vec2d(200,30))   , new Vertex(new Vec2d(800,600))  , new Vertex(new Vec2d(400,200))  ,new Vertex(new Vec2d(60,100))   ];
+let vertex_arr = [new Vertex(new Vec2d(200,30))   , new Vertex(new Vec2d(800,600))  , new Vertex(new Vec2d(400,200))  ,new Vertex(new Vec2d(60,100)) ];
 
 
 
@@ -76,8 +78,16 @@ canvas.addEventListener("mousedown", (e) => {
             dragOffset = vec_sub(mousePoint , vertex_arr[i].position);
             selected_vertex = vertex_arr[i];
             console.log("dragging set");
+            return;
         }
-}
+
+       
+    }
+
+     //else spawn a new vertex
+        vertex_arr.push(new Vertex(new Vec2d(mousePoint.x,mousePoint.y)));
+
+
 });
 //mousemove (updates the global mousePoint variable as well as handles the dragging logic)
  canvas.addEventListener("mousemove", (e) => {
@@ -88,7 +98,7 @@ canvas.addEventListener("mousedown", (e) => {
         //calculate the delta
         let delta = vec_sub(mousePoint , dragOffset);
        // selected_vertex.position = vec_sub(mousePoint,delta); //i think this needs to be integrated but leaving for now  
-       //selected_vertex.position = mousePoint; //this passes by refence as both are objects instead see the next line
+       //selected_vertex.position = mousePoint; //this passes by reference as both are objects instead see the next line
        selected_vertex.position = new Vec2d(mousePoint.x, mousePoint.y); 
         console.log("currently dragging");
     }
@@ -99,6 +109,8 @@ canvas.addEventListener("mouseup", () => {
   selected_vertex= null;
   console.log("dragging finished");
 });
+
+
 //======================================================================================================================================//
 
 
@@ -138,7 +150,7 @@ function Loop(){
             
             
             //go from the second vertex to the third vertex
-                for(let t = 0;t<1; t+=0.01)
+                for(let t = 0;t<curve.points.length - 3.0; t+=0.01)
                 {
                     curve_arr.push(curve.getSplinePoint(t));
                 }
