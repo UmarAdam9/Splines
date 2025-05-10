@@ -4,29 +4,35 @@ const msPerFrame = 1000 / fps;
 
 
 class Vertex{
-
     constructor(pos, r=10){
         this.position = pos;
         this.radius = r;
     }
 }
-
 class Spline{
-    
-    constructor(p){
+    constructor(p, loop = false, d = 0.01){
         this.points = p;
+        this.curve_points=[];
+        this.delta = d;
+        this.isLooped = loop;
     }
-
     getSplinePoint(t){
 
         let p0,p1,p2,p3;
 
-
+      if(!this.isLooped)
+      {
         p1 = Math.floor(t)+1;       //still dont *quite* get this
         p2 = p1+1;
         p3 = p2+1;
         p0 = p1-1;
-
+      }
+      else{
+        p1 = Math.floor(t);       //still dont *quite* get this
+        p2 = (p1+1) % this.points.length;
+        p3 = (p2+1) % this.points.length;
+        p0 = p1>=1 ? p1-1 : this.points.length -1;
+      }
         t = t - Math.floor(t);      //dont get this either
 
         //console.log(p0,p1,p2,p3);
@@ -46,25 +52,37 @@ class Spline{
         return new Vec2d(tx,ty);
     }
 
-        
-    
+    calculate_curve_points()
+    {
+      this.curve_points.length = 0;
+      if(!this.isLooped)
+      {
+          for(let t = 0; t < this.points.length-3.0 ; t+=this.delta)
+         {
+          this.curve_points.push(this.getSplinePoint(t));
+         }
+
+      }
+
+      else
+      {
+        for(let t = 0; t < this.points.length ; t+=this.delta)
+         {
+          this.curve_points.push(this.getSplinePoint(t));
+         }
+      }
+    }
 }
-
-
-
-
 let vertex_arr = [new Vertex(new Vec2d(830,214))   , new Vertex(new Vec2d(968,589))  , new Vertex(new Vec2d(606,606))  ,new Vertex(new Vec2d(673,219)) ];
-
-
-
-
-
-
 //=========== Dragging Vertex with mouse Logic (to be reused in the future )===========================================================//
 let mousePoint = new Vec2d(0,0);
 let isDragging = false;
 let dragOffset = new Vec2d(0,0);
 let selected_vertex = null;
+
+
+let curve = new Spline(vertex_arr, true, 0.001);  //FUTURE : make it so that vec2d array can be extracted instead of using the vertex array
+
 
 // Mouse down
 canvas.addEventListener("mousedown", (e) => {
@@ -80,10 +98,7 @@ canvas.addEventListener("mousedown", (e) => {
             console.log("dragging set");
             return;
         }
-
-       
     }
-
      //else spawn a new vertex
         vertex_arr.splice(vertex_arr.length -1 , 0, new Vertex(new Vec2d(mousePoint.x,mousePoint.y)));
 
@@ -114,15 +129,6 @@ canvas.addEventListener("mouseup", () => {
 //======================================================================================================================================//
 
 
-
-
-let curve = new Spline(vertex_arr);  //FUTURE : make it so that vec2d array can be extracted instead of using the vertex array
-
-let curve_arr = [];
-
-
-
-
 function Loop(){
 
     animationID = requestAnimationFrame(Loop);
@@ -142,63 +148,25 @@ function Loop(){
        
         //clear screen
             ctx.beginPath();
-            ctx.fillStyle = "black";
+            ctx.fillStyle = "orange";
             ctx.fillRect(0,0,canvas.width ,canvas.height);
-           
-            
-
-            
-            
-            //go from the second vertex to the third vertex
-                for(let t = 0;t<curve.points.length - 3.0; t+=0.01)
-                {
-                    curve_arr.push(curve.getSplinePoint(t));
-                }
-
-            
-
-
-
-
-
-
+                  
+            curve.calculate_curve_points(); //recalculate everyframe
 
               //draw them vertex
-
               for(let i=0; i<vertex_arr.length;i++)
               {
                 FillCircle(vertex_arr[i].position,1,"red");
                 DrawCircle(vertex_arr[i].position,vertex_arr[i].radius,point_checker_circle(mousePoint,vertex_arr[i].position,vertex_arr[i].radius)?"yellow":"red");
-
               }
-
-
-              //draw the mousePoint
-              FillCircle(mousePoint,2,"yellow");
-
+             
               //Draw the curve points
-                for(let i=0; i<curve_arr.length;i++)
-                {
-                    FillCircle(curve_arr[i], 2 , "white");
+                for(let i=0; i<curve.curve_points.length;i++)
+                {   
+                    FillCircle(curve.curve_points[i], 2 , "white");
                 }
-
-              
-
-
-              //draw the selected vertex in green
-            //   if(selected_vertex){
-            //     FillCircle(selected_vertex.position,1,"red");
-            //     DrawCircle(selected_vertex.position,selected_vertex.radius,"green");
-            //   }
-            
-        
-          
                 console.log(vertex_arr);
-                
-              //empty the curve array every frame
-                //curve_arr = []; // DONT do it this way , this breaks the reference to spline.points!!!!!!!!!!!!!!!!!!!!! or does it? EDIT : doesnt seem to??
-                curve_arr.length=0;
-     
+
     }
 
     
