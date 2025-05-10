@@ -53,7 +53,7 @@ class Spline{
 
 
 
-let vertex_arr = [new Vertex(new Vec2d(200,30))   , new Vertex(new Vec2d(800,600))  , new Vertex(new Vec2d(400,200))  ,new Vertex(new Vec2d(60,100)) ];
+let vertex_arr = [new Vertex(new Vec2d(830,214))   , new Vertex(new Vec2d(968,589))  , new Vertex(new Vec2d(606,606))  ,new Vertex(new Vec2d(673,219)) ];
 
 
 
@@ -85,7 +85,7 @@ canvas.addEventListener("mousedown", (e) => {
     }
 
      //else spawn a new vertex
-        vertex_arr.push(new Vertex(new Vec2d(mousePoint.x,mousePoint.y)));
+        vertex_arr.splice(vertex_arr.length -1 , 0, new Vertex(new Vec2d(mousePoint.x,mousePoint.y)));
 
 
 });
@@ -193,7 +193,8 @@ function Loop(){
             
         
           
-      
+                console.log(vertex_arr);
+                
               //empty the curve array every frame
                 //curve_arr = []; // DONT do it this way , this breaks the reference to spline.points!!!!!!!!!!!!!!!!!!!!! or does it? EDIT : doesnt seem to??
                 curve_arr.length=0;
